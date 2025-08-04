@@ -37,9 +37,10 @@ invest/
 │   └── migrations/         # Database migrations
 ├── public/                 # Static assets
 ├── src/
-│   ├── components/          # React components
+│   ├── components/         # React components
 │   ├── routes/             # Tanstack Start routes
 │   ├── lib/                # Utilities & helpers
+│   ├── styles/             # Styles
 └── tests/                  # Test files
 ```
 
