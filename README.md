@@ -32,16 +32,14 @@ When using multiple brokers (neobrokers, direct banks, specialty providers), it'
 
 ```
 invest/
-├── app/
-│   ├── components/          # React components
-│   ├── routes/             # Tanstack Start routes
-│   ├── lib/                # Utilities & helpers
-│   ├── domain/             # Domain logic & events
-│   └── server/             # Server-only code
 ├── prisma/
 │   ├── schema.prisma       # Database schema
 │   └── migrations/         # Database migrations
 ├── public/                 # Static assets
+├── src/
+│   ├── components/          # React components
+│   ├── routes/             # Tanstack Start routes
+│   ├── lib/                # Utilities & helpers
 └── tests/                  # Test files
 ```
 
@@ -73,9 +71,6 @@ bun dev
 # Build
 bun build
 ```
-
-## 📊 Data Model (Concept)
-
 
 ## 🔄 Import Strategy
 
