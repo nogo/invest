@@ -9,6 +9,7 @@ out
 dist
 *.tgz
 /build
+/data
 src/generated
 
 # code coverage
