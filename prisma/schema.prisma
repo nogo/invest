@@ -9,3 +9,33 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+enum EventType {
+  // Core Trading Events
+  TRADE_EXECUTED // Buy/sell stocks, ETFs, options
+
+  // Income Events  
+  DIVIDEND_RECEIVED // Stock dividends
+
+  // Corporate Actions (Basic)
+  STOCK_SPLIT_EXECUTED // Stock splits
+  SYMBOL_CHANGED // Symbol changes (FB -> META)
+
+  // Corrections
+  TRADE_CORRECTED // Fix trade details
+
+  @@map("event_types")
+}
+
+// Event Sourcing - Core Event Store
+model Event {
+  id        String    @id @default(cuid(2))
+  eventType EventType // Specific event type (TRADE_EXECUTED, etc.)
+  timestamp DateTime  @default(now())
+  payload   String // JSON payload containing event data
+
+  // Essential indexes for performance
+  @@index([eventType, timestamp])
+  @@index([timestamp])
+  @@map("events")
+}
