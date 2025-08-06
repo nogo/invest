@@ -2,8 +2,7 @@ import { z } from 'zod'
 
 // Base types for trading
 export const TradeDirection = z.enum(['BUY', 'SELL'])
-export const AssetType = z.enum(['STOCK', 'ETF', 'OPTION', 'BOND', 'MUTUAL_FUND'])
-export const OptionType = z.enum(['CALL', 'PUT'])
+export const AssetType = z.enum(['STOCK', 'ETF'])
 export const Currency = z.enum(['USD', 'EUR', 'GBP', 'CAD', 'CHF', 'JPY'])
 
 // ISIN validation - 12 characters: 2 country code + 9 alphanumeric + 1 check digit
@@ -62,28 +61,9 @@ export const TradeExecutedPayload = z.object({
   notes: z.string().optional(),
 })
 
-// Options-specific payload (extends base trade)
-export const OptionTradeExecutedPayload = TradeExecutedPayload.extend({
-  assetType: z.literal('OPTION'),
-  
-  // Option-specific fields
-  optionType: OptionType,
-  underlyingSymbol: z.string(), // e.g., "AAPL" for AAPL options
-  strikePrice: z.number().positive(),
-  expirationDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  contractSize: z.number().positive().default(100), // Usually 100 shares per contract
-  
-  // Option trading specifics
-  impliedVolatility: z.number().min(0).optional(),
-  delta: z.number().optional(),
-  gamma: z.number().optional(),
-  theta: z.number().optional(),
-  vega: z.number().optional(),
-})
 
 // Type exports
 export type TradeExecutedPayload = z.infer<typeof TradeExecutedPayload>
-export type OptionTradeExecutedPayload = z.infer<typeof OptionTradeExecutedPayload>
 export type TradeDirection = z.infer<typeof TradeDirection>
 export type AssetType = z.infer<typeof AssetType>
 export type Currency = z.infer<typeof Currency>
@@ -139,35 +119,6 @@ export const exampleStockTrade: TradeExecutedPayload = {
   marketType: "REGULAR"
 }
 
-export const exampleOptionTrade: OptionTradeExecutedPayload = {
-  tradeId: "T123456790",
-  // ISIN for the option itself (if available) or underlying
-  isin: "US0378331005", // Underlying Apple ISIN
-  symbol: "AAPL240119C00150000", // Standard option symbol format
-  assetType: "OPTION",
-  direction: "BUY",
-  quantity: 1, // 1 contract
-  price: 5.25, // Premium per share
-  totalAmount: 525.00, // 1 contract * 100 shares * $5.25
-  tradeDate: "2024-01-15",
-  settlementDate: "2024-01-16", // Options settle T+1
-  commission: 1.00,
-  fees: 0.25,
-  currency: "USD",
-  exchangeRate: 1,
-  accountId: "ACC123",
-  brokerName: "Interactive Brokers",
-  marketType: "REGULAR",
-  
-  // Option-specific
-  optionType: "CALL",
-  underlyingSymbol: "AAPL",
-  strikePrice: 150.00,
-  expirationDate: "2024-01-19",
-  contractSize: 100,
-  impliedVolatility: 0.25,
-  delta: 0.65
-}
 
 // Dividend Received Event Payload
 export const DividendReceivedPayload = z.object({

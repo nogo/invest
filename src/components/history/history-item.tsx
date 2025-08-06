@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
 import { Activity, DollarSign, Calendar, TrendingUp, TrendingDown } from "lucide-react"
@@ -100,7 +101,7 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
             )}
             
             <p className="text-xs text-muted-foreground mt-1">
-              {new Date(event.timestamp).toLocaleString()}
+              {format(new Date(event.timestamp), 'MMM d, yyyy \'at\' h:mm a')}
             </p>
           </div>
         </div>

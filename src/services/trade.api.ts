@@ -1,47 +1,45 @@
 import { createServerFn } from '@tanstack/react-start'
+import { addBusinessDays, format } from 'date-fns'
 import { TradeExecutedPayload } from '~/lib/events/trading-events'
 import { EventType } from '~/generated/prisma/client'
+import { TradeFormSchema } from '~/services/trade.schema'
 import prisma from '~/lib/prisma'
 
-
 export const createTradeEvent = createServerFn({ method: 'POST' })
-  .validator(TradeExecutedPayload)
-  .handler(async ({ data }) => {
+  .validator(TradeFormSchema)
+  .handler(async ({ data: formData }) => {
+    // Transform form data into full event payload
+    const tradePayload: TradeExecutedPayload = {
+      tradeId: `T${Date.now()}`, // Generate unique trade ID
+      isin: formData.isin,
+      symbol: formData.symbol.toUpperCase(),
+      assetType: formData.assetType,
+      direction: formData.direction,
+      quantity: formData.quantity,
+      price: formData.price,
+      totalAmount: formData.direction === 'BUY'
+        ? (formData.quantity * formData.price) + formData.commission + formData.fees
+        : (formData.quantity * formData.price) - formData.commission - formData.fees,
+      tradeDate: formData.tradeDate,
+      settlementDate: format(addBusinessDays(new Date(formData.tradeDate), 2), 'yyyy-MM-dd'), // T+2 business days
+      commission: formData.commission,
+      fees: formData.fees,
+      currency: formData.currency,
+      exchangeRate: 1, // Default to 1, will be enhanced later
+      accountId: formData.accountId,
+      brokerName: formData.brokerName,
+      exchange: formData.exchange || undefined,
+      marketType: 'REGULAR' as const,
+      notes: formData.notes || undefined,
+    };
+
+    // Create the event in the database
     return await prisma.event.create({
       data: {
         eventType: EventType.TRADE_EXECUTED,
-        payload: JSON.stringify(data),
+        payload: JSON.stringify(tradePayload),
         timestamp: new Date(),
       },
     });
   })
 
-
-// Server function to create a dividend received event
-export const createDividendEvent = createServerFn({
-  method: 'POST',
-}).handler(async (payload: unknown): Promise<{ success: boolean; eventId?: string; error?: string }> => {
-  try {
-    // TODO: Add dividend payload validation when implementing dividend forms
-
-    const event = await prisma.event.create({
-      data: {
-        eventType: EventType.DIVIDEND_RECEIVED,
-        payload: JSON.stringify(payload),
-        timestamp: new Date(),
-      },
-    })
-
-    return {
-      success: true,
-      eventId: event.id,
-    }
-  } catch (error) {
-    console.error('Error creating dividend event:', error)
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to create dividend event',
-    }
-  }
-})

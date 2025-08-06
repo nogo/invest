@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { format } from 'date-fns'
 import prisma from '~/lib/prisma'
 import { EventType } from '~/generated/prisma/client'
 
@@ -44,7 +45,7 @@ export const getInvestmentTimeline = createServerFn({
     events.forEach(event => {
       const payload = JSON.parse(event.payload)
       const eventDate = new Date(event.timestamp)
-      const monthKey = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}`
+      const monthKey = format(eventDate, 'yyyy-MM')
       
       // Calculate investment change (positive for purchases, negative for sales)
       const investmentChange = payload.direction === 'BUY' 

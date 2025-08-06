@@ -5,7 +5,7 @@ import { PortfolioSummary } from '~/components/portfolio/portfolio-summary'
 import { Button } from '~/components/ui/button'
 import { Plus, Upload } from 'lucide-react'
 import { InvestmentChart } from '~/components/portfolio/investment-chart'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 const searchSchema = z.object({
   q: z.string().optional(),

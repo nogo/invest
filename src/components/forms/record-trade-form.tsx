@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form'
+import { format } from 'date-fns'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -9,30 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
-import { TradeExecutedPayload } from "~/lib/events/trading-events"
-import { z } from 'zod/v4'
 import { useRecordTradeMutation } from '~/services/queries'
-
-// Form schema for trade execution
-const tradeFormSchema = z.object({
-  isin: z.string().min(12, 'ISIN must be 12 characters').max(12, 'ISIN must be 12 characters'),
-  symbol: z.string().min(1, 'Symbol is required'),
-  assetType: z.enum(['STOCK', 'ETF', 'OPTION', 'BOND', 'MUTUAL_FUND']),
-  direction: z.enum(['BUY', 'SELL']),
-  quantity: z.number().positive('Quantity must be positive'),
-  price: z.number().positive('Price must be positive'),
-  tradeDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  settlementDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  commission: z.number().min(0, 'Commission cannot be negative'),
-  fees: z.number().min(0, 'Fees cannot be negative'),
-  currency: z.enum(['USD', 'EUR', 'GBP', 'CAD', 'CHF', 'JPY']),
-  accountId: z.string().min(1, 'Account ID is required'),
-  brokerName: z.string().min(1, 'Broker name is required'),
-  exchange: z.string().optional(),
-  notes: z.string().optional(),
-})
-
-type TradeFormData = z.infer<typeof tradeFormSchema>
+import { TradeFormSchema } from '~/services/trade.schema'
 
 interface AddTransactionSidebarProps {
   onTransactionAdded?: () => void
@@ -49,8 +28,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       direction: 'BUY' as const,
       quantity: 0,
       price: 0,
-      tradeDate: new Date().toISOString().split('T')[0],
-      settlementDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // T+2
+      tradeDate: format(new Date(), 'yyyy-MM-dd'),
       commission: 0,
       fees: 0,
       currency: 'USD' as const,
@@ -60,37 +38,27 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       notes: '',
     },
     onSubmit: async ({ formApi, value }) => {
-      // Calculate total amount
-      const totalAmount = value.direction === 'BUY'
-        ? (value.quantity * value.price) + value.commission + value.fees
-        : (value.quantity * value.price) - value.commission - value.fees
-
-      // Create the trade payload
-      const tradePayload: TradeExecutedPayload = {
-        tradeId: `T${Date.now()}`, // Generate a simple trade ID
+      // Ensure required fields have values before sending
+      const formData = {
         isin: value.isin,
-        symbol: value.symbol.toUpperCase(),
+        symbol: value.symbol,
         assetType: value.assetType,
         direction: value.direction,
         quantity: value.quantity,
         price: value.price,
-        totalAmount,
-        tradeDate: value.tradeDate,
-        settlementDate: value.settlementDate,
+        tradeDate: (value.tradeDate || format(new Date(), 'yyyy-MM-dd')) as string,
         commission: value.commission,
         fees: value.fees,
         currency: value.currency,
-        exchangeRate: 1, // Default to 1, will be enhanced later
         accountId: value.accountId,
         brokerName: value.brokerName,
-        exchange: value.exchange,
-        marketType: 'REGULAR',
-        notes: value.notes,
-      }
-
-      await recordTrade.mutateAsync({ data: value });
+        exchange: value.exchange || undefined,
+        notes: value.notes || undefined,
+      };
+      
+      await recordTrade.mutateAsync({ data: formData });
       formApi.reset();
-
+      onTransactionAdded?.();
     },
   })
 
@@ -159,9 +127,6 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
                   <SelectContent>
                     <SelectItem value="STOCK">Stock</SelectItem>
                     <SelectItem value="ETF">ETF</SelectItem>
-                    <SelectItem value="OPTION">Option</SelectItem>
-                    <SelectItem value="BOND">Bond</SelectItem>
-                    <SelectItem value="MUTUAL_FUND">Mutual Fund</SelectItem>
                   </SelectContent>
                 </Select>
               </>
