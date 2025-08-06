@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-router'
 import { DefaultCatchBoundary } from '~/components/default-catch-boundary'
 import { NotFound } from '~/components/not-found'
+import { MainNav } from '~/components/main-nav'
 import { seo } from '~/lib/seo'
 
 import appCss from "~/styles/app.css?url"
@@ -23,9 +24,8 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       ...seo({
-        title:
-          'TanStack Start | Type-Safe, Client-First, Full-Stack React Framework',
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+        title: 'Invest',
+        description: 'Personal investment tracking application with consolidated portfolio oversight across multiple brokers.',
       }),
     ],
     links: [
@@ -49,7 +49,12 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <div className="min-h-screen bg-background">
+        <MainNav />
+        <main>
+          <Outlet />
+        </main>
+      </div>
     </RootDocument>
   )
 }

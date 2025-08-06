@@ -88,15 +88,6 @@ export type TradeDirection = z.infer<typeof TradeDirection>
 export type AssetType = z.infer<typeof AssetType>
 export type Currency = z.infer<typeof Currency>
 
-// Helper function to validate trade payload
-export function validateTradePayload(data: unknown): TradeExecutedPayload {
-  return TradeExecutedPayload.parse(data)
-}
-
-export function validateOptionTradePayload(data: unknown): OptionTradeExecutedPayload {
-  return OptionTradeExecutedPayload.parse(data)
-}
-
 // Symbol Change Event - handles when a stock symbol changes but ISIN stays the same
 export const SymbolChangedPayload = z.object({
   // Asset identification
