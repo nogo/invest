@@ -1,7 +1,9 @@
 import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
 import { Activity, DollarSign, Calendar, TrendingUp, TrendingDown } from "lucide-react"
+import { formatCurrency } from '~/lib/i18n'
 
 interface EventData {
   id: string
@@ -16,15 +18,17 @@ interface HistoryItemProps {
 }
 
 export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
-  const formatEventType = (type: string) => {
-    return type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount)
+  const { t } = useTranslation('common');
+  
+  const getEventTypeTranslation = (type: string) => {
+    switch (type) {
+      case 'TRADE_EXECUTED':
+        return t('trade.tradeExecuted')
+      case 'DIVIDEND_RECEIVED':
+        return t('trade.dividendReceived')
+      default:
+        return type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+    }
   }
 
   const getEventIcon = (type: string) => {
@@ -71,7 +75,7 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <p className="text-sm font-medium">
-                {formatEventType(event.type)}
+                {getEventTypeTranslation(event.type)}
               </p>
               <Badge variant="outline" className="text-xs">
                 {event.type}
@@ -81,10 +85,10 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
             {event.type === 'TRADE_EXECUTED' && (
               <div className="text-sm text-muted-foreground">
                 <p>
-                  {event.payload.direction} {event.payload.quantity} {event.payload.symbol} @ {formatCurrency(event.payload.price)}
+                  {event.payload.direction === 'BUY' ? t('trade.buy') : t('trade.sell')} {event.payload.quantity} {event.payload.symbol} @ {formatCurrency(event.payload.price)}
                 </p>
                 <p>
-                  {event.payload.brokerName} " {event.payload.assetType}
+                  {event.payload.brokerName} • {event.payload.assetType}
                 </p>
               </div>
             )}
@@ -92,10 +96,10 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
             {event.type === 'DIVIDEND_RECEIVED' && (
               <div className="text-sm text-muted-foreground">
                 <p>
-                  {event.payload.symbol} " {event.payload.sharesHeld} shares
+                  {event.payload.symbol} • {event.payload.sharesHeld} {t('common.shares')}
                 </p>
                 <p>
-                  {formatCurrency(event.payload.dividendAmount)} per share
+                  {formatCurrency(event.payload.dividendAmount)} {t('common.perShare')}
                 </p>
               </div>
             )}

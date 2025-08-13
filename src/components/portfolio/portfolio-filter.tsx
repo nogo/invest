@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+import { useTranslation } from 'react-i18next'
 import { Input } from "~/components/ui/input"
 import { Button } from "~/components/ui/button"
 import { X, Search, ArrowRight, Loader2 } from "lucide-react"
@@ -9,6 +10,7 @@ interface PortfolioFilterProps {
 }
 
 export function PortfolioFilter({ query }: PortfolioFilterProps) {
+  const { t } = useTranslation('common');
   const navigate = useNavigate()
 
   const form = useForm({
@@ -38,7 +40,7 @@ export function PortfolioFilter({ query }: PortfolioFilterProps) {
           {(field) => (
             <Input
               type="text"
-              placeholder="Filter by broker ($robinhood) or position (@aapl)..."
+              placeholder={t('portfolio.filterPlaceholder')}
               id={field.name}
               name={field.name}
               value={field.state.value}
@@ -75,7 +77,7 @@ export function PortfolioFilter({ query }: PortfolioFilterProps) {
         />
       </form>
       <p className="text-xs text-muted-foreground">
-        Use $ for brokers (e.g., $robinhood) and @ for positions (e.g., @aapl). Combine multiple filters.
+        {t('portfolio.filterHelp')}
       </p>
     </div>
   )

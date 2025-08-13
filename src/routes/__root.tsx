@@ -10,6 +10,7 @@ import { DefaultCatchBoundary } from '~/components/layout/default-catch-boundary
 import { NotFound } from '~/components/layout/not-found'
 import { MainNav } from '~/components/layout/main-nav'
 import { seo } from '~/lib/seo'
+import '~/lib/i18n'
 
 import appCss from "~/styles/app.css?url"
 

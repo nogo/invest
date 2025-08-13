@@ -5,6 +5,7 @@ import { PortfolioSummary } from '~/components/portfolio/portfolio-summary'
 import { Button } from '~/components/ui/button'
 import { Plus, Upload } from 'lucide-react'
 import { InvestmentChart } from '~/components/portfolio/investment-chart'
+import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 const searchSchema = z.object({
@@ -24,7 +25,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const { search } = Route.useLoaderData();
-
+  const { t } = useTranslation('common');
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -34,12 +35,12 @@ function Home() {
         <div className="flex gap-2">
           <Button size="sm" variant="outline">
             <Upload className="h-4 w-4 mr-2" />
-            Import
+            {t('actions.import')}
           </Button>
           <Link to="/history/create">
             <Button size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              New Trade
+              {t('actions.newTrade')}
             </Button>
           </Link>
         </div>

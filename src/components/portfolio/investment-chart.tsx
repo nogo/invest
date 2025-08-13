@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import {
   ChartConfig,
@@ -26,14 +27,15 @@ interface InvestmentChartProps {
 }
 
 export function InvestmentChart({ className }: InvestmentChartProps) {
+  const { t } = useTranslation('common');
   const { data: investmentTimelineData = [], isLoading, isError } = useQuery(portfolioQueries.timeline())
 
   if (isLoading) {
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Investment Timeline</CardTitle>
-          <CardDescription>Loading investment data...</CardDescription>
+          <CardTitle>{t('portfolio.investmentTimeline')}</CardTitle>
+          <CardDescription>{t('portfolio.loadingInvestment')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -48,12 +50,12 @@ export function InvestmentChart({ className }: InvestmentChartProps) {
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>Investment Timeline</CardTitle>
-          <CardDescription>No investment data available</CardDescription>
+          <CardTitle>{t('portfolio.investmentTimeline')}</CardTitle>
+          <CardDescription>{t('portfolio.noData')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Record your first trade to see your investment timeline
+            {t('history.firstTrade')}
           </div>
         </CardContent>
       </Card>
@@ -63,7 +65,7 @@ export function InvestmentChart({ className }: InvestmentChartProps) {
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Investment Timeline</CardTitle>
+        <CardTitle>{t('portfolio.investmentTimeline')}</CardTitle>
         <CardDescription>
           Your investment journey over time - comparing money invested vs portfolio value ({investmentTimelineData.length} data points)
         </CardDescription>

@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { format } from 'date-fns'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -19,6 +20,7 @@ interface AddTransactionSidebarProps {
 }
 
 export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarProps) {
+  const { t } = useTranslation('common');
   const recordTrade = useRecordTradeMutation();
   const { data: brokers = [] } = useQuery(brokerQueries.list());
 
@@ -97,7 +99,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           name="isin"
           children={(field) => (
             <>
-              <Label htmlFor={field.name}>ISIN *</Label>
+              <Label htmlFor={field.name}>{t('trade.isin')} *</Label>
               <Input
                 id={field.name}
                 value={field.state.value}
@@ -118,7 +120,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           name="symbol"
           children={(field) => (
             <>
-              <Label htmlFor={field.name}>Symbol</Label>
+              <Label htmlFor={field.name}>{t('trade.symbol')}</Label>
               <Input
                 id={field.name}
                 value={field.state.value}
@@ -139,14 +141,14 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="assetType"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Type *</Label>
+                <Label htmlFor={field.name}>{t('trade.assetType')} *</Label>
                 <Select value={field.state.value} onValueChange={(value) => field.handleChange(value as any)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="STOCK">Stock</SelectItem>
-                    <SelectItem value="ETF">ETF</SelectItem>
+                    <SelectItem value="STOCK">{t('trade.stock')}</SelectItem>
+                    <SelectItem value="ETF">{t('trade.etf')}</SelectItem>
                   </SelectContent>
                 </Select>
               </>
@@ -159,14 +161,14 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="direction"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Direction *</Label>
+                <Label htmlFor={field.name}>{t('trade.tradeType')} *</Label>
                 <Select value={field.state.value} onValueChange={(value) => field.handleChange(value as any)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="BUY">Buy</SelectItem>
-                    <SelectItem value="SELL">Sell</SelectItem>
+                    <SelectItem value="BUY">{t('trade.buy')}</SelectItem>
+                    <SelectItem value="SELL">{t('trade.sell')}</SelectItem>
                   </SelectContent>
                 </Select>
               </>
@@ -182,7 +184,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="quantity"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Quantity *</Label>
+                <Label htmlFor={field.name}>{t('trade.quantity')} *</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -205,7 +207,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="price"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Price *</Label>
+                <Label htmlFor={field.name}>{t('trade.price')} *</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -230,7 +232,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           name="tradeDate"
           children={(field) => (
             <>
-              <Label htmlFor={field.name}>Trade Date *</Label>
+              <Label htmlFor={field.name}>{t('trade.tradeDate')} *</Label>
               <Input
                 id={field.name}
                 type="date"
@@ -252,7 +254,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="commission"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Commission</Label>
+                <Label htmlFor={field.name}>{t('trade.commission')}</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -272,7 +274,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             name="fees"
             children={(field) => (
               <>
-                <Label htmlFor={field.name}>Fees</Label>
+                <Label htmlFor={field.name}>{t('trade.fees')}</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -294,14 +296,14 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           name="broker"
           children={(field) => (
             <>
-              <Label htmlFor={field.name}>Broker *</Label>
+              <Label htmlFor={field.name}>{t('trade.broker')} *</Label>
               <Combobox
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value)}
                 options={brokerOptions}
-                placeholder="Select or enter broker"
-                searchPlaceholder="Search brokers..."
-                emptyText="No broker found."
+                placeholder={t('trade.selectBroker')}
+                searchPlaceholder={t('trade.searchBrokers')}
+                emptyText={t('trade.noBroker')}
                 allowCustom={true}
               />
               {field.state.meta.errors && (
@@ -330,7 +332,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
                 name="accountId"
                 children={(field) => (
                   <>
-                    <Label htmlFor={field.name}>Account ID</Label>
+                    <Label htmlFor={field.name}>{t('trade.accountId')}</Label>
                     <Input
                       id={field.name}
                       value={field.state.value}
@@ -354,12 +356,12 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           name="notes"
           children={(field) => (
             <>
-              <Label htmlFor={field.name}>Notes</Label>
+              <Label htmlFor={field.name}>{t('trade.notes')}</Label>
               <Input
                 id={field.name}
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Optional notes"
+                placeholder={t('trade.optionalNotes')}
               />
             </>
           )}
@@ -374,7 +376,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             disabled={!canSubmit || isSubmitting}
             className="w-full"
           >
-            {isSubmitting ? 'Recording...' : 'Save Trade'}
+            {isSubmitting ? t('trade.recording') : t('trade.saveTrade')}
           </Button>
         )}
       />

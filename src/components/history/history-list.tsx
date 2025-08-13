@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Calendar } from "lucide-react"
 import { historyQueries } from '~/services/queries'
@@ -10,14 +11,15 @@ interface HistoryListProps {
 }
 
 export function HistoryList({ searchQuery }: HistoryListProps) {
+  const { t } = useTranslation('common');
   const { data: events = [], isLoading } = useQuery(historyQueries.list(searchQuery))
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>History</CardTitle>
-          <CardDescription>Loading trade history...</CardDescription>
+          <CardTitle>{t('history.title')}</CardTitle>
+          <CardDescription>{t('history.loadingHistory')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
@@ -32,17 +34,17 @@ export function HistoryList({ searchQuery }: HistoryListProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>History</CardTitle>
+        <CardTitle>{t('history.title')}</CardTitle>
         <CardDescription>
-          Recent trade events
+          {t('history.recentEvents')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {events.length === 0 ? (
           <div className="text-center py-8">
             <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-2">No events found</p>
-            <p className="text-sm text-muted-foreground">Record your first trade to get started</p>
+            <p className="text-muted-foreground mb-2">{t('history.noEvents')}</p>
+            <p className="text-sm text-muted-foreground">{t('history.firstTrade')}</p>
           </div>
         ) : (
           <>
