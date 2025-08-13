@@ -75,6 +75,7 @@ This is a **personal investment tracking application** built with modern full-st
 
 ### Key Directories
 - `src/components/` - React components including shadcn/ui components
+- `src/features/` - Feature-based modules (trades, portfolio, etc.)
 - `src/routes/` - File-based routing with TanStack Router
 - `src/services/` - API layer with schema definitions and query functions
 - `src/lib/` - Utilities and shared logic
@@ -129,6 +130,12 @@ This is a **personal portfolio management application** for consolidated oversig
 - Financial accuracy and audit trails are critical requirements
 - Use event sourcing patterns for any transaction-related functionality
 - Leverage SQLite views for complex queries rather than maintaining separate projection tables
+
+### Feature Structure
+- Features are organized in `src/features/` with domain-driven modules
+- Each feature contains its own components, services, types, and business logic
+- Feature folders use plural naming (e.g., `trades/`, `portfolio/`, `dividends/`)
+- Shared components remain in `src/components/` for reuse across features
 
 ### Component Patterns
 - When creating components with mapping logic, extract individual components for each map operation
