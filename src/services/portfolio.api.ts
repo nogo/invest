@@ -78,7 +78,7 @@ export const getInvestmentTimeline = createServerFn({
       }
     })
 
-    return timeline.slice(-12) // Return last 12 months
+    return timeline // Return full history
   } catch (error) {
     console.error('Error fetching investment timeline:', error)
     return []
