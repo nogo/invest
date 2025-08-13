@@ -1,15 +1,32 @@
-const { PrismaClient } = require("../src/generated/prisma/client");
-const { PrismaBunSQLite } = require("@synapsenwerkstatt/prisma-bun-sqlite-adapter");
+import { PrismaClient, EventType } from "../src/generated/prisma/client";
+import { PrismaBunSQLite } from "@synapsenwerkstatt/prisma-bun-sqlite-adapter";
+import type {
+  TradeExecutedPayload,
+  DividendReceivedPayload,
+} from "../src/lib/events/trading-events";
 
 // Create adapter and Prisma client for seeding
 const adapter = new PrismaBunSQLite({ url: process.env.DATABASE_URL || "file:./dev.db" });
 const prisma = new PrismaClient({ adapter });
 
+// Define event structure for seeding
+interface SeedTradeEvent {
+  eventType: EventType;
+  timestamp: Date;
+  payload: TradeExecutedPayload;
+}
+
+interface SeedDividendEvent {
+  eventType: EventType;
+  timestamp: Date;
+  payload: DividendReceivedPayload;
+}
+
 // Sample trade events data
-const sampleTradeEvents = [
+const sampleTradeEvents: SeedTradeEvent[] = [
   // Initial Apple purchase
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-01-15T10:30:00Z'),
     payload: {
       tradeId: "T20240115001",
@@ -35,7 +52,7 @@ const sampleTradeEvents = [
   
   // Microsoft purchase
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-01-22T14:15:00Z'),
     payload: {
       tradeId: "T20240122001",
@@ -61,7 +78,7 @@ const sampleTradeEvents = [
 
   // VWRL ETF purchase at DKB
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-02-05T09:00:00Z'),
     payload: {
       tradeId: "T20240205001",
@@ -88,7 +105,7 @@ const sampleTradeEvents = [
 
   // Google purchase
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-02-28T11:45:00Z'),
     payload: {
       tradeId: "T20240228001",
@@ -114,7 +131,7 @@ const sampleTradeEvents = [
 
   // Tesla purchase at Scalable Capital
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-03-10T13:20:00Z'),
     payload: {
       tradeId: "T20240310001",
@@ -140,7 +157,7 @@ const sampleTradeEvents = [
 
   // Apple additional purchase
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-04-15T10:00:00Z'),
     payload: {
       tradeId: "T20240415001",
@@ -166,7 +183,7 @@ const sampleTradeEvents = [
 
   // Partial Microsoft sale
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-05-20T15:30:00Z'),
     payload: {
       tradeId: "T20240520001",
@@ -193,7 +210,7 @@ const sampleTradeEvents = [
 
   // NVIDIA purchase
   {
-    eventType: 'TRADE_EXECUTED',
+    eventType: EventType.TRADE_EXECUTED,
     timestamp: new Date('2024-06-12T12:15:00Z'),
     payload: {
       tradeId: "T20240612001",
@@ -219,10 +236,10 @@ const sampleTradeEvents = [
 ];
 
 // Sample dividend events
-const sampleDividendEvents = [
+const sampleDividendEvents: SeedDividendEvent[] = [
   // Apple dividend
   {
-    eventType: 'DIVIDEND_RECEIVED',
+    eventType: EventType.DIVIDEND_RECEIVED,
     timestamp: new Date('2024-02-16T08:00:00Z'),
     payload: {
       isin: "US0378331005",
@@ -243,7 +260,7 @@ const sampleDividendEvents = [
 
   // Microsoft dividend
   {
-    eventType: 'DIVIDEND_RECEIVED',
+    eventType: EventType.DIVIDEND_RECEIVED,
     timestamp: new Date('2024-03-14T08:00:00Z'),
     payload: {
       isin: "US5949181045",
@@ -264,7 +281,7 @@ const sampleDividendEvents = [
 
   // VWRL dividend
   {
-    eventType: 'DIVIDEND_RECEIVED',
+    eventType: EventType.DIVIDEND_RECEIVED,
     timestamp: new Date('2024-04-02T08:00:00Z'),
     payload: {
       isin: "IE00B3RBWM25",
@@ -285,7 +302,7 @@ const sampleDividendEvents = [
 
   // Apple second dividend (after additional purchase)
   {
-    eventType: 'DIVIDEND_RECEIVED',
+    eventType: EventType.DIVIDEND_RECEIVED,
     timestamp: new Date('2024-05-17T08:00:00Z'),
     payload: {
       isin: "US0378331005",
@@ -305,7 +322,7 @@ const sampleDividendEvents = [
   }
 ];
 
-async function main() {
+async function main(): Promise<void> {
   console.log('🌱 Starting seed process...');
 
   // Clear existing events

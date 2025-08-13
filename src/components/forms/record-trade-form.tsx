@@ -1,5 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { format } from 'date-fns'
+import { useQuery } from '@tanstack/react-query'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -10,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
-import { useRecordTradeMutation } from '~/services/queries'
+import { useRecordTradeMutation, brokerQueries } from '~/services/queries'
+import { Combobox } from '../ui/combobox'
 
 interface AddTransactionSidebarProps {
   onTransactionAdded?: () => void
@@ -18,6 +20,26 @@ interface AddTransactionSidebarProps {
 
 export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarProps) {
   const recordTrade = useRecordTradeMutation();
+  const { data: brokers = [] } = useQuery(brokerQueries.list());
+
+  const brokerOptions = brokers.map(broker => ({
+    value: broker.brokerName + ' [' + broker.accountId + ']',
+    label: broker.brokerName + ' / ' + broker.accountId,
+  }));
+
+  // Function to extract account ID from broker selection
+  const extractAccountId = (brokerValue: string): string => {
+    if (!brokerValue) return '';
+    const match = brokerValue.match(/\[(.+)\]$/);
+    return match?.[1] || '';
+  };
+
+  // Function to extract broker name from broker selection
+  const extractBrokerName = (brokerValue: string): string => {
+    if (!brokerValue) return '';
+    const match = brokerValue.match(/^(.+)\s\[.+\]$/);
+    return match?.[1] || brokerValue; // Return original value if no pattern match (custom entry)
+  };
 
   const form = useForm({
     defaultValues: {
@@ -32,7 +54,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       fees: 0,
       currency: 'USD' as const,
       accountId: '',
-      brokerName: '',
+      broker: '',
       exchange: '',
       notes: '',
     },
@@ -50,7 +72,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
         fees: value.fees,
         currency: value.currency,
         accountId: value.accountId,
-        brokerName: value.brokerName,
+        brokerName: extractBrokerName(value.broker),
         exchange: value.exchange || undefined,
         notes: value.notes || undefined,
       };
@@ -269,41 +291,18 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       {/* Broker Information */}
       <div className="space-y-2">
         <form.Field
-          name="brokerName"
+          name="broker"
           children={(field) => (
             <>
               <Label htmlFor={field.name}>Broker *</Label>
-              <Select value={field.state.value} onValueChange={(value) => field.handleChange(value as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select broker" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Interactive Brokers">Interactive Brokers</SelectItem>
-                  <SelectItem value="DKB">DKB</SelectItem>
-                  <SelectItem value="Scalable Capital">Scalable Capital</SelectItem>
-                  <SelectItem value="Trade Republic">Trade Republic</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors && (
-                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-              )}
-            </>
-          )}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <form.Field
-          name="accountId"
-          children={(field) => (
-            <>
-              <Label htmlFor={field.name}>Account ID *</Label>
-              <Input
-                id={field.name}
+              <Combobox
                 value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="U123456789"
+                onValueChange={(value) => field.handleChange(value)}
+                options={brokerOptions}
+                placeholder="Select or enter broker"
+                searchPlaceholder="Search brokers..."
+                emptyText="No broker found."
+                allowCustom={true}
               />
               {field.state.meta.errors && (
                 <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
@@ -312,6 +311,42 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
           )}
         />
       </div>
+
+      <form.Subscribe
+        selector={(state) => state.values.broker}
+        children={(broker) => {
+          // Auto-update account ID when broker changes
+          const currentAccountId = form.getFieldValue('accountId') as string;
+          const expectedAccountId = extractAccountId(broker);
+          
+          // Only update if the expected account ID is different and not empty
+          if (expectedAccountId && currentAccountId !== expectedAccountId) {
+            form.setFieldValue('accountId', expectedAccountId);
+          }
+
+          return (
+            <div className="space-y-2">
+              <form.Field
+                name="accountId"
+                children={(field) => (
+                  <>
+                    <Label htmlFor={field.name}>Account ID</Label>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="U123456789"
+                    />
+                    {field.state.meta.errors && (
+                      <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+          );
+        }}
+      />
 
       {/* Notes */}
       <div className="space-y-2">
