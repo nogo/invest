@@ -31,12 +31,15 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
     }
   }
 
-  const getEventIcon = (type: string) => {
+  const getEventIcon = (type: string, payload?: any) => {
     switch (type) {
       case 'TRADE_EXECUTED':
-        return <Activity className="h-4 w-4" />
+        // Use direction-specific icons for better visual clarity
+        return payload?.direction === 'BUY' 
+          ? <TrendingDown className="h-4 w-4 text-red-500" />
+          : <TrendingUp className="h-4 w-4 text-green-500" />
       case 'DIVIDEND_RECEIVED':
-        return <DollarSign className="h-4 w-4" />
+        return <DollarSign className="h-4 w-4 text-green-500" />
       default:
         return <Calendar className="h-4 w-4" />
     }
@@ -44,7 +47,8 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
 
   const getEventColor = (type: string, payload: any) => {
     if (type === 'TRADE_EXECUTED') {
-      return payload.direction === 'BUY' ? 'text-green-600' : 'text-red-600'
+      // Cash flow perspective: BUY = money out (red), SELL = money in (green)
+      return payload.direction === 'BUY' ? 'text-red-600' : 'text-green-600'
     }
     if (type === 'DIVIDEND_RECEIVED') {
       return 'text-green-600'
@@ -70,7 +74,7 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted mt-1">
-            {getEventIcon(event.type)}
+            {getEventIcon(event.type, event.payload)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -119,16 +123,9 @@ export function HistoryItem({ event, showSeparator }: HistoryItemProps) {
             )}
           </p>
           {event.type === 'TRADE_EXECUTED' && (
-            <div className="flex items-center mt-1">
-              {event.payload.direction === 'BUY' ? (
-                <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-              ) : (
-                <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-              )}
-              <span className="text-xs text-muted-foreground">
-                {event.payload.direction}
-              </span>
-            </div>
+            <span className="text-xs text-muted-foreground mt-1 block">
+              {event.payload.direction}
+            </span>
           )}
         </div>
       </div>
