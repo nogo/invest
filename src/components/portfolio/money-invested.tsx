@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { portfolioQueries } from '~/services/queries'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 
 interface MoneyInvestedProps {
   className?: string

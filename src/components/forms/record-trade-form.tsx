@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { useRecordTradeMutation } from '~/services/queries'
-import { TradeFormSchema } from '~/services/trade.schema'
 
 interface AddTransactionSidebarProps {
   onTransactionAdded?: () => void
@@ -55,7 +54,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
         exchange: value.exchange || undefined,
         notes: value.notes || undefined,
       };
-      
+
       await recordTrade.mutateAsync({ data: formData });
       formApi.reset();
       onTransactionAdded?.();
@@ -71,28 +70,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       }}
       className="space-y-4"
     >
-      {/* Asset Information */}
-      <div className="space-y-2">
-        <form.Field
-          name="symbol"
-          children={(field) => (
-            <>
-              <Label htmlFor={field.name}>Symbol *</Label>
-              <Input
-                id={field.name}
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
-                placeholder="AAPL"
-              />
-              {field.state.meta.errors && (
-                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
-              )}
-            </>
-          )}
-        />
-      </div>
-
-      <div className="space-y-2">
+      {/* Asset Information */}<div className="space-y-2">
         <form.Field
           name="isin"
           children={(field) => (
@@ -104,6 +82,26 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
                 onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
                 placeholder="US0378331005"
                 maxLength={12}
+              />
+              {field.state.meta.errors && (
+                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+              )}
+            </>
+          )}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <form.Field
+          name="symbol"
+          children={(field) => (
+            <>
+              <Label htmlFor={field.name}>Symbol</Label>
+              <Input
+                id={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
+                placeholder="AAPL"
               />
               {field.state.meta.errors && (
                 <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>

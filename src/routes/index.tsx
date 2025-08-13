@@ -15,8 +15,7 @@ export const Route = createFileRoute('/')({
   component: Home,
   validateSearch: searchSchema,
   loaderDeps: ({ search: { q } }) => ({ search: q }),
-  loader: async ({ context, deps: { search } }) => {
-
+  loader: async ({ deps: { search } }) => {
     return {
       search
     }

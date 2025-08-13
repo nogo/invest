@@ -6,9 +6,9 @@ import {
   HeadContent,
   Scripts,
 } from '@tanstack/react-router'
-import { DefaultCatchBoundary } from '~/components/default-catch-boundary'
-import { NotFound } from '~/components/not-found'
-import { MainNav } from '~/components/main-nav'
+import { DefaultCatchBoundary } from '~/components/layout/default-catch-boundary'
+import { NotFound } from '~/components/layout/not-found'
+import { MainNav } from '~/components/layout/main-nav'
 import { seo } from '~/lib/seo'
 
 import appCss from "~/styles/app.css?url"

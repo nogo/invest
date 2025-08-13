@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button"
 import { X, Search, ArrowRight, Loader2 } from "lucide-react"
 
 interface PortfolioFilterProps {
-  query?: string
+  query?: string | undefined
 }
 
 export function PortfolioFilter({ query }: PortfolioFilterProps) {
