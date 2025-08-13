@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '~/components/ui/badge'
-import { portfolioQueries } from '~/services/queries'
 import { formatCurrency } from '~/lib/i18n'
+import { portfolioQueries } from '../api/queries'
 
 interface CurrentValueProps {
   className?: string

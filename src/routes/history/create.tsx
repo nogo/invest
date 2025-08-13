@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { RecordTradeForm } from '~/components/forms/record-trade-form'
+import { RecordTradeForm } from '~/features/transactions/components/record-trade-form'
 
 export const Route = createFileRoute('/history/create')({
   component: HistoryCreate,

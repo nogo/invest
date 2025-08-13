@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
-import { Activity, DollarSign, Calendar, TrendingUp, TrendingDown } from "lucide-react"
+import { DollarSign, Calendar, TrendingUp, TrendingDown } from "lucide-react"
 import { formatCurrency } from '~/lib/i18n'
 
 interface EventData {

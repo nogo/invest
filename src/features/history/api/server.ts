@@ -2,10 +2,8 @@ import { createServerFn } from '@tanstack/react-start'
 import prisma from '~/lib/prisma'
 import { TradeExecutedPayload } from '~/lib/events/trading-events'
 import { EventType } from '~/generated/prisma/client'
-import { FilterSchema } from './schema'
 
-export const listHistory = createServerFn({ method: 'POST' })
-  //.validator(FilterSchema)
+export const listHistory = createServerFn({ method: 'GET' })
   .handler(async () => {
 
     const whereClause: any = {

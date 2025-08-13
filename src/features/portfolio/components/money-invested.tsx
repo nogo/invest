@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { portfolioQueries } from '~/services/queries'
 import { formatCurrency } from '~/lib/i18n'
+import { portfolioQueries } from '../api/queries';
 
 interface MoneyInvestedProps {
   className?: string

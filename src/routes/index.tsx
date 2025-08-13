@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { HistoryList } from '~/components/history/history-list'
-import { PortfolioFilter } from '~/components/portfolio/portfolio-filter'
-import { PortfolioSummary } from '~/components/portfolio/portfolio-summary'
 import { Button } from '~/components/ui/button'
 import { Plus, Upload } from 'lucide-react'
-import { InvestmentChart } from '~/components/portfolio/investment-chart'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
+import { PortfolioSummary } from '~/features/portfolio/components/portfolio-summary'
+import { PortfolioFilter } from '~/features/portfolio/components/portfolio-filter'
+import { InvestmentChart } from '~/features/portfolio/components/investment-chart'
+import { HistoryList } from '~/features/history/components/history-list'
 
 const searchSchema = z.object({
   q: z.string().optional(),

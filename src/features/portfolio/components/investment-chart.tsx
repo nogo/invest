@@ -8,8 +8,8 @@ import {
   ChartTooltipContent,
 } from "~/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts"
-import { portfolioQueries } from '~/services/queries'
 import { useMemo } from 'react'
+import { portfolioQueries } from '../api/queries'
 
 
 const chartConfig = {

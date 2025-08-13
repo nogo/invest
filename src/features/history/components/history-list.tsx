@@ -2,9 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Calendar } from "lucide-react"
-import { historyQueries } from '~/services/queries'
 import { HistoryItem } from "./history-item"
-
+import { historyQueries } from '../api/queries'
 
 interface HistoryListProps {
   searchQuery?: string;
