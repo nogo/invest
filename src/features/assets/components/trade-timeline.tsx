@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Badge } from "~/components/ui/badge"
 import { ChevronUp, ChevronDown, Calendar } from "lucide-react"
 import type { TradeExecution } from '~/features/portfolio/domain/position-calculator'
+import { formatCurrencyCutted } from '~/lib/i18n'
 
 interface TradeTimelineProps {
   trades: TradeExecution[]
@@ -34,14 +35,13 @@ function TradeItem({ trade, isFirst, isLast }: TradeItemProps) {
       {!isLast && (
         <div className="absolute left-4 top-12 w-0.5 h-full bg-border" />
       )}
-      
+
       <div className="flex items-start gap-4">
         {/* Timeline marker */}
-        <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 ${
-          isBuy 
-            ? 'bg-green-50 border-green-500 text-green-700' 
-            : 'bg-red-50 border-red-500 text-red-700'
-        }`}>
+        <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 ${isBuy
+          ? 'bg-red-50 border-red-500 text-red-700'
+          : 'bg-green-50 border-green-500 text-green-700'
+          }`}>
           {isBuy ? (
             <ChevronUp className="w-4 h-4" />
           ) : (
@@ -64,7 +64,7 @@ function TradeItem({ trade, isFirst, isLast }: TradeItemProps) {
               {format(trade.tradeDate, 'MMM dd, yyyy')}
             </span>
           </div>
-          
+
           <div className="text-sm text-muted-foreground space-y-1">
             <div className="flex justify-between">
               <span>Total Value:</span>
@@ -72,7 +72,7 @@ function TradeItem({ trade, isFirst, isLast }: TradeItemProps) {
                 {formatCurrency(trade.totalValue, trade.currency)}
               </span>
             </div>
-            
+
             {(trade.fees > 0 || trade.commission > 0) && (
               <div className="flex justify-between">
                 <span>Fees & Commission:</span>
@@ -81,14 +81,14 @@ function TradeItem({ trade, isFirst, isLast }: TradeItemProps) {
                 </span>
               </div>
             )}
-            
+
             <div className="flex justify-between font-medium pt-1 border-t">
               <span>Total {isBuy ? 'Cost' : 'Proceeds'}:</span>
               <span className={isBuy ? 'text-red-600' : 'text-green-600'}>
                 {isBuy ? '-' : '+'}{formatCurrency(totalWithFees, trade.currency)}
               </span>
             </div>
-            
+
             {trade.brokerName && (
               <div className="flex justify-between text-xs">
                 <span>Broker:</span>
@@ -123,15 +123,15 @@ export function TradeTimeline({ trades, symbol }: TradeTimelineProps) {
   const totalBought = trades
     .filter(t => t.direction === 'BUY')
     .reduce((sum, t) => sum + t.quantity, 0)
-  
+
   const totalSold = trades
     .filter(t => t.direction === 'SELL')
     .reduce((sum, t) => sum + t.quantity, 0)
-  
+
   const totalInvested = trades
     .filter(t => t.direction === 'BUY')
     .reduce((sum, t) => sum + t.totalCost, 0)
-  
+
   const totalProceeds = trades
     .filter(t => t.direction === 'SELL')
     .reduce((sum, t) => sum + Math.abs(t.totalCost), 0)
@@ -143,39 +143,25 @@ export function TradeTimeline({ trades, symbol }: TradeTimelineProps) {
         <CardDescription>
           All {trades.length} trade{trades.length !== 1 ? 's' : ''} for {symbol}
         </CardDescription>
-        
+
         {/* Trade Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 p-4 bg-muted/50 rounded-lg">
           <div className="text-center">
-            <p className="text-sm font-medium text-green-600">Total Bought</p>
+            <p className="text-sm font-medium text-red-600">Total Bought</p>
             <p className="text-lg font-bold">{totalBought}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm font-medium text-red-600">Total Sold</p>
+            <p className="text-sm font-medium text-green-600">Total Sold</p>
             <p className="text-lg font-bold">{totalSold}</p>
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-muted-foreground">Total Invested</p>
-            <p className="text-lg font-bold">
-              {new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: trades[0]?.currency || 'EUR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              }).format(totalInvested)}
-            </p>
+            <p className="text-lg font-bold">{formatCurrencyCutted(totalInvested, trades[0]?.currency || 'EUR')}</p>
           </div>
           {totalProceeds > 0 && (
             <div className="text-center">
               <p className="text-sm font-medium text-muted-foreground">Total Proceeds</p>
-              <p className="text-lg font-bold">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: trades[0]?.currency || 'EUR',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(totalProceeds)}
-              </p>
+              <p className="text-lg font-bold">{formatCurrencyCutted(totalProceeds, trades[0]?.currency || 'EUR')}</p>
             </div>
           )}
         </div>

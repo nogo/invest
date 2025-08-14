@@ -9,6 +9,9 @@ import { assetQueries } from '~/features/assets/api/queries'
 import { TradeTimeline } from '~/features/assets/components/trade-timeline'
 import { PositionHistory } from '~/features/assets/components/position-history'
 import { AssetChart } from '~/features/assets/components/asset-chart'
+import { formatCurrency } from '~/lib/i18n'
+import { formatPercent, numberColor } from '~/lib/format'
+import { cn } from '~/lib/utils'
 
 export const Route = createFileRoute('/assets/$symbol')({
   component: AssetDetail,
@@ -21,24 +24,6 @@ function AssetDetail() {
   const { data: assetData, isLoading, isError } = useQuery(
     assetQueries.assetDetail(symbol.toUpperCase())
   )
-
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  const formatPercent = (percent: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'percent',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      signDisplay: 'always'
-    }).format(percent / 100)
-  }
 
   if (isLoading) {
     return (
@@ -158,7 +143,7 @@ function AssetDetail() {
                       {formatCurrency(currentPrice, position.currency)}
                     </p>
                     {position.dailyChange !== undefined && (
-                      <p className={`text-xs ${position.dailyChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className={cn("text-xs", numberColor(position.dailyChange))}>
                         {position.dailyChange > 0 ? '+' : ''}
                         {formatCurrency(position.dailyChange, position.currency)} today
                       </p>
@@ -167,12 +152,10 @@ function AssetDetail() {
 
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Unrealized P&L</h3>
-                    <p className={`text-2xl font-bold ${position.unrealizedGain >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                    <p className={cn("text-2xl font-bold", numberColor(position.unrealizedGain))}>
                       {formatCurrency(position.unrealizedGain, position.currency)}
                     </p>
-                    <p className={`text-xs ${position.unrealizedGain >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
+                    <p className={cn("text-xs", numberColor(position.unrealizedGain))}>
                       {formatPercent(position.unrealizedGainPercent)}
                     </p>
                   </div>
@@ -201,8 +184,7 @@ function AssetDetail() {
               {position.totalRealizedGain !== 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Realized Gains</h3>
-                  <p className={`text-xl font-semibold ${position.totalRealizedGain >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                  <p className={cn("text-xl font-semibold", numberColor(position.totalRealizedGain))}>
                     {formatCurrency(position.totalRealizedGain, position.currency)}
                   </p>
                 </div>

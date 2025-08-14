@@ -25,31 +25,31 @@ i18n
     resources,
     fallbackLng: 'en',
     debug: false,
-    
+
     // Language detection options
     detection: {
       // Order and priorities of detection methods
       order: ['navigator', 'htmlTag', 'path', 'subdomain'],
-      
+
       // Keys to lookup language from
       lookupFromPathIndex: 0,
       lookupFromSubdomainIndex: 0,
-      
+
       // Cache user language on
       caches: ['localStorage']
     },
-    
+
     // Only allow supported languages
     supportedLngs: ['en', 'de'],
-    
+
     // Namespace configuration
     defaultNS: 'common',
     ns: ['common'],
-    
+
     interpolation: {
       escapeValue: false // React already does escaping
     },
-    
+
     // React specific options
     react: {
       useSuspense: false // We'll handle loading states manually
@@ -64,6 +64,16 @@ export const formatCurrency = (amount: number, currency = 'EUR', locale?: string
   return new Intl.NumberFormat(currentLocale, {
     style: 'currency',
     currency: currency
+  }).format(amount)
+}
+
+export const formatCurrencyCutted = (amount: number, currency = 'EUR', locale?: string) => {
+  const currentLocale = locale || i18n.language
+  return new Intl.NumberFormat(currentLocale, {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount)
 }
 

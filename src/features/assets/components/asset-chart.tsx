@@ -20,6 +20,7 @@ import {
 import { ChevronUp, ChevronDown, BarChart3 } from "lucide-react"
 import type { TradeExecution } from '~/features/portfolio/domain/position-calculator'
 import type { PriceData } from '~/features/prices/domain/types'
+import { formatCurrency } from '~/lib/i18n'
 
 interface AssetChartProps {
   symbol: string
@@ -114,16 +115,6 @@ export function AssetChart({ symbol, trades, priceData }: AssetChartProps) {
 
     return data.sort((a, b) => parseInt(a.date) - parseInt(b.date))
   }, [trades, priceData])
-
-  const formatCurrency = (amount: number, currency?: string) => {
-    const curr = currency || trades[0]?.currency || 'EUR'
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: curr,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length > 0) {
