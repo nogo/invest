@@ -20,7 +20,7 @@ import {
 import { ChevronUp, ChevronDown, BarChart3 } from "lucide-react"
 import type { TradeExecution } from '~/features/portfolio/domain/position-calculator'
 import type { PriceData } from '~/features/prices/domain/types'
-import { formatCurrency } from '~/lib/i18n'
+import { formatCurrency, formatPercent } from '~/lib/i18n'
 
 interface AssetChartProps {
   symbol: string
@@ -361,7 +361,7 @@ export function AssetChart({ symbol, trades, priceData }: AssetChartProps) {
                         priceData.changePercent >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
                         {priceData.change ? formatCurrency(priceData.change, currency) : ''}
-                        {priceData.changePercent ? ` (${priceData.changePercent.toFixed(2)}%)` : ''}
+                        {priceData.changePercent ? ` (${formatPercent(priceData.changePercent)})` : ''}
                       </span>
                     </>
                   )}

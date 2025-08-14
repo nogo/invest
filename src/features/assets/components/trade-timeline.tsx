@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Badge } from "~/components/ui/badge"
 import { ChevronUp, ChevronDown, Calendar } from "lucide-react"
 import type { TradeExecution } from '~/features/portfolio/domain/position-calculator'
-import { formatCurrencyCutted } from '~/lib/i18n'
+import { formatCurrencyCutted, formatCurrency } from '~/lib/i18n'
 
 interface TradeTimelineProps {
   trades: TradeExecution[]
@@ -17,14 +17,6 @@ interface TradeItemProps {
 }
 
 function TradeItem({ trade, isFirst, isLast }: TradeItemProps) {
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
 
   const isBuy = trade.direction === 'BUY'
   const totalWithFees = Math.abs(trade.totalCost)

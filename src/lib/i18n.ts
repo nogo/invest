@@ -86,12 +86,46 @@ export const formatPercentage = (value: number, locale?: string) => {
   }).format(value / 100)
 }
 
-export const formatNumber = (value: number, locale?: string) => {
+/**
+ * Format percentage values with proper locale support and sign display
+ * @param percent - The percentage value (as a number, e.g. 5.5 for 5.5%)
+ * @param showSign - Whether to always show the sign (+ or -)
+ */
+export const formatPercent = (percent: number, showSign = false, locale?: string) => {
+  if (showSign) {
+    const formatted = formatPercentage(percent, locale)
+    if (percent > 0 && !formatted.startsWith('+')) {
+      return '+' + formatted
+    }
+    return formatted
+  }
+  return formatPercentage(percent, locale)
+}
+
+export const formatNumber = (value: number, decimals = 2, locale?: string) => {
   const currentLocale = locale || i18n.language
   return new Intl.NumberFormat(currentLocale, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
   }).format(value)
+}
+
+/**
+ * Format large numbers with appropriate suffixes (K, M, B)
+ * Useful for compact display of large monetary values
+ */
+export const formatCompactCurrency = (amount: number, currency = 'EUR', locale?: string) => {
+  const absAmount = Math.abs(amount)
+
+  if (absAmount >= 1_000_000_000) {
+    return formatCurrency(amount / 1_000_000_000, currency, locale) + 'B'
+  } else if (absAmount >= 1_000_000) {
+    return formatCurrency(amount / 1_000_000, currency, locale) + 'M'
+  } else if (absAmount >= 1_000) {
+    return formatCurrency(amount / 1_000, currency, locale) + 'K'
+  }
+
+  return formatCurrency(amount, currency, locale)
 }
 
 export const formatDate = (date: Date, locale?: string, options?: Intl.DateTimeFormatOptions) => {
@@ -103,3 +137,4 @@ export const formatDate = (date: Date, locale?: string, options?: Intl.DateTimeF
   }
   return new Intl.DateTimeFormat(currentLocale, options || defaultOptions).format(date)
 }
+

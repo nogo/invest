@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '~/components/ui/badge'
-import { formatCurrency } from '~/lib/i18n'
+import { formatCurrency, formatPercent } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
 
 interface CurrentValueProps {
@@ -62,7 +62,7 @@ export function CurrentValue({ className }: CurrentValueProps) {
       </div>
       <div className="flex items-center mt-1">
         <span className={`text-sm font-medium ${isPositiveReturn ? "text-green-600" : "text-red-600"}`}>
-          {isPositiveReturn ? "+" : ""}{formatCurrency(totalReturn)} ({totalReturnPercent.toFixed(2)}%) {t('portfolio.totalGain')}
+          {isPositiveReturn ? "+" : ""}{formatCurrency(totalReturn)} ({formatPercent(totalReturnPercent)}) {t('portfolio.totalGain')}
         </span>
       </div>
     </div>

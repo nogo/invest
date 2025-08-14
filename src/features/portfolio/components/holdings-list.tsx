@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
 import { TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react"
+import { formatCurrency, formatPercent } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
 import type { EnrichedPosition } from '../domain/portfolio-aggregator'
 
@@ -19,24 +20,6 @@ interface PositionItemProps {
 
 function PositionItem({ position }: PositionItemProps) {
 	const { t } = useTranslation('common')
-	
-	const formatCurrency = (amount: number, currency: string) => {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: currency,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(amount)
-	}
-
-	const formatPercent = (percent: number) => {
-		return new Intl.NumberFormat('en-US', {
-			style: 'percent',
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-			signDisplay: 'always'
-		}).format(percent / 100)
-	}
 
 	const getGainBadgeVariant = (gain: number) => {
 		if (gain > 0) return 'default' // Green
@@ -120,7 +103,7 @@ function PositionItem({ position }: PositionItemProps) {
 								position.unrealizedGain > 0 ? 'text-green-600' : 
 								position.unrealizedGain < 0 ? 'text-red-600' : 'text-gray-600'
 							}`}>
-								{formatPercent(position.unrealizedGainPercent)}
+								{formatPercent(position.unrealizedGainPercent, true)}
 							</span>
 						</div>
 					)}

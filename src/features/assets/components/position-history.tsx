@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Badge } from "~/components/ui/badge"
 import { Progress } from "~/components/ui/progress"
 import { TrendingUp, TrendingDown, Minus, DollarSign, Percent } from "lucide-react"
+import { formatNumber, formatCurrency, formatPercent } from '~/lib/i18n'
 import type { EnrichedPosition } from '~/features/portfolio/domain/portfolio-aggregator'
 
 interface PositionHistoryProps {
@@ -10,32 +11,9 @@ interface PositionHistoryProps {
 }
 
 export function PositionHistory({ position }: PositionHistoryProps) {
-  const { t } = useTranslation('common')
-
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount)
-  }
-
-  const formatPercent = (percent: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'percent',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      signDisplay: 'always'
-    }).format(percent / 100)
-  }
-
   // Calculate some derived metrics
   const hasRealizedGains = position.totalRealizedGain !== 0
   const hasPosition = position.currentQuantity > 0
-  const costBasisPercentage = position.totalBuyValue > 0 
-    ? (position.totalCostBasis / position.totalBuyValue) * 100 
-    : 100
 
   const getPerformanceIcon = (gain: number) => {
     if (gain > 0) return <TrendingUp className="h-4 w-4 text-green-600" />
@@ -114,7 +92,7 @@ export function PositionHistory({ position }: PositionHistoryProps) {
                         {formatCurrency(position.unrealizedGain, position.currency)}
                       </div>
                       <div className={`text-xs ${getPerformanceColor(position.unrealizedGain)}`}>
-                        {formatPercent(position.unrealizedGainPercent)}
+                        {formatPercent(position.unrealizedGainPercent, true)}
                       </div>
                     </div>
                   </div>
@@ -144,7 +122,7 @@ export function PositionHistory({ position }: PositionHistoryProps) {
                       {formatCurrency(position.totalGain, position.currency)}
                     </div>
                     <div className={`text-xs ${getPerformanceColor(position.totalGain)}`}>
-                      {formatPercent(position.totalGainPercent)}
+                      {formatPercent(position.totalGainPercent, true)}
                     </div>
                   </div>
                 </div>
@@ -248,8 +226,8 @@ export function PositionHistory({ position }: PositionHistoryProps) {
             <div>
               <p className="text-2xl font-bold">
                 {position.totalFeesAndCommissions > 0 && position.totalBuyValue > 0
-                  ? ((position.totalFeesAndCommissions / position.totalBuyValue) * 100).toFixed(2)
-                  : '0.00'
+                  ? formatNumber((position.totalFeesAndCommissions / position.totalBuyValue) * 100, 2)
+                  : formatNumber(0, 2)
                 }%
               </p>
               <p className="text-xs text-muted-foreground">Fee Percentage</p>

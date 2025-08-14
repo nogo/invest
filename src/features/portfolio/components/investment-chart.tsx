@@ -9,6 +9,7 @@ import {
 } from "~/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "recharts"
 import { useMemo } from 'react'
+import { formatCurrencyCutted } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
 
 
@@ -190,14 +191,7 @@ export function InvestmentChart({ className }: InvestmentChartProps) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(value)
-              }
+              tickFormatter={(value) => formatCurrencyCutted(value, 'USD')}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
