@@ -70,7 +70,8 @@
     "noBroker": "Kein Broker gefunden.",
     "optionalNotes": "Optionale Notizen",
     "tradeExecuted": "Trade Ausgeführt",
-    "dividendReceived": "Dividende Erhalten"
+    "dividendReceived": "Dividende Erhalten",
+    "currency": "Währung"
   },
   "history": {
     "title": "Verlauf",

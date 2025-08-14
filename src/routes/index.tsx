@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { PortfolioSummary } from '~/features/portfolio/components/portfolio-summary'
 import { PortfolioFilter } from '~/features/portfolio/components/portfolio-filter'
 import { InvestmentChart } from '~/features/portfolio/components/investment-chart'
+import { HoldingsList } from '~/features/portfolio/components/holdings-list'
 import { HistoryList } from '~/features/history/components/history-list'
 
 const searchSchema = z.object({
@@ -47,10 +48,14 @@ function Home() {
       </div>
 
       <div className="my-8">
-        <PortfolioFilter searchQuery={search} />
+        <PortfolioFilter query={search} />
       </div>
 
       <InvestmentChart />
+
+      <div className="mt-8">
+        <HoldingsList searchQuery={search} />
+      </div>
 
       <div className="mt-8">
         <HistoryList searchQuery={search} />

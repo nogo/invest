@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HistoryCreateRouteImport } from './routes/history/create'
+import { Route as AssetsSymbolRouteImport } from './routes/assets/$symbol'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const HistoryCreateRoute = HistoryCreateRouteImport.update({
   path: '/history/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AssetsSymbolRoute = AssetsSymbolRouteImport.update({
+  id: '/assets/$symbol',
+  path: '/assets/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assets/$symbol': typeof AssetsSymbolRoute
   '/history/create': typeof HistoryCreateRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assets/$symbol': typeof AssetsSymbolRoute
   '/history/create': typeof HistoryCreateRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assets/$symbol': typeof AssetsSymbolRoute
   '/history/create': typeof HistoryCreateRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/history/create'
+  fullPaths: '/' | '/assets/$symbol' | '/history/create'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history/create'
-  id: '__root__' | '/' | '/history/create'
+  to: '/' | '/assets/$symbol' | '/history/create'
+  id: '__root__' | '/' | '/assets/$symbol' | '/history/create'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssetsSymbolRoute: typeof AssetsSymbolRoute
   HistoryCreateRoute: typeof HistoryCreateRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/assets/$symbol': {
+      id: '/assets/$symbol'
+      path: '/assets/$symbol'
+      fullPath: '/assets/$symbol'
+      preLoaderRoute: typeof AssetsSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssetsSymbolRoute: AssetsSymbolRoute,
   HistoryCreateRoute: HistoryCreateRoute,
 }
 export const routeTree = rootRouteImport

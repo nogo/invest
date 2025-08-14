@@ -2,6 +2,9 @@ import { createServerFn } from '@tanstack/react-start'
 import { format } from 'date-fns'
 import prisma from '~/lib/prisma'
 import { EventType } from '~/generated/prisma/client'
+import { portfolioAggregator } from '../domain/portfolio-aggregator'
+import type { TradeExecution } from '../domain/position-calculator'
+import type { Currency } from '~/features/prices/domain/types'
 
 export interface InvestmentTimelinePoint {
   date: string
@@ -17,6 +20,38 @@ export interface PortfolioSummary {
   totalReturnPercent: number
   dayChange: number
   dayChangePercent: number
+}
+
+/**
+ * Convert event payload to TradeExecution
+ */
+function parseTradeExecution(event: any): TradeExecution {
+  const payload = JSON.parse(event.payload)
+  const totalValue = payload.quantity * payload.price
+  const fees = payload.fees || 0
+  const commission = payload.commission || 0
+  
+  const totalCost = payload.direction === 'BUY' 
+    ? totalValue + fees + commission
+    : totalValue - fees - commission
+
+  return {
+    id: event.id,
+    isin: payload.isin || '',
+    symbol: payload.symbol || '',
+    assetType: payload.assetType || 'STOCK',
+    direction: payload.direction,
+    quantity: payload.quantity,
+    price: payload.price,
+    totalValue,
+    fees,
+    commission,
+    totalCost,
+    currency: payload.currency || 'EUR',
+    tradeDate: new Date(event.timestamp),
+    brokerName: payload.brokerName || '',
+    accountId: payload.accountId || ''
+  }
 }
 
 // Server function to get investment timeline data from events
@@ -38,47 +73,31 @@ export const getInvestmentTimeline = createServerFn({
       return []
     }
 
-    // Process events to build timeline
-    const timelineMap = new Map<string, { invested: number, value: number }>()
-    let totalInvested = 0
+    // Convert events to TradeExecution objects
+    const trades = events.map(parseTradeExecution)
 
-    events.forEach(event => {
-      const payload = JSON.parse(event.payload)
-      const eventDate = new Date(event.timestamp)
-      const monthKey = format(eventDate, 'yyyy-MM')
-      
-      // Calculate investment change (positive for purchases, negative for sales)
-      const investmentChange = payload.direction === 'BUY' 
-        ? payload.totalAmount || (payload.quantity * payload.price)
-        : -(payload.totalAmount || (payload.quantity * payload.price))
-      
-      totalInvested += investmentChange
-      
-      // For now, assume portfolio value equals invested amount (no gains/losses calculated yet)
-      // TODO: Implement proper portfolio valuation with current market prices
-      const currentValue = totalInvested * 1.1 // Mock 10% gain for visualization
-      
-      timelineMap.set(monthKey, {
-        invested: Math.max(0, totalInvested),
-        value: Math.max(0, currentValue),
-      })
-    })
-
-    // Convert map to array and format for chart
-    const timeline = Array.from(timelineMap.entries()).map(([monthKey, data]) => {
-      const [year, month] = monthKey.split('-')
+    // Use portfolio aggregator to calculate timeline
+    const timelineData = portfolioAggregator.calculatePortfolioTimeline(trades)
+    
+    // Format for chart
+    const timeline = timelineData.map(point => {
+      const [year, month] = point.date.split('-')
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
       
+      // For now, use invested amount as value until we get real-time pricing
+      // TODO: Calculate current market value using price service
+      const currentValue = point.invested * 1.05 // Mock 5% average gain
+      
       return {
-        date: monthKey,
-        invested: Math.round(data.invested),
-        value: Math.round(data.value),
+        date: point.date,
+        invested: Math.round(point.invested),
+        value: Math.round(currentValue),
         month: `${monthNames[parseInt(month, 10) - 1]} ${year}`,
       }
     })
 
-    return timeline // Return full history
+    return timeline
   } catch (error) {
     console.error('Error fetching investment timeline:', error)
     return []
@@ -111,36 +130,19 @@ export const getPortfolioSummary = createServerFn({
       }
     }
 
-    // Calculate invested capital from trade events
-    let investedCapital = 0
-    events.forEach(event => {
-      const payload = JSON.parse(event.payload)
-      
-      // Calculate investment change (positive for purchases, negative for sales)
-      const investmentChange = payload.direction === 'BUY' 
-        ? payload.totalAmount || (payload.quantity * payload.price)
-        : -(payload.totalAmount || (payload.quantity * payload.price))
-      
-      investedCapital += investmentChange
-    })
+    // Convert events to TradeExecution objects
+    const trades = events.map(parseTradeExecution)
 
-    // For now, mock the current portfolio value with some gains
-    // TODO: Implement proper portfolio valuation with current market prices
-    const totalValue = investedCapital * 1.14 // Mock 14% gain
-    const totalReturn = totalValue - investedCapital
-    const totalReturnPercent = investedCapital > 0 ? (totalReturn / investedCapital) * 100 : 0
-
-    // Mock day change (1% of portfolio value)
-    const dayChange = totalValue * 0.01
-    const dayChangePercent = 1.0
+    // Use portfolio aggregator to get complete summary
+    const summary = await portfolioAggregator.getPortfolioSummary(trades)
 
     return {
-      totalValue: Math.round(totalValue),
-      investedCapital: Math.round(Math.max(0, investedCapital)),
-      totalReturn: Math.round(totalReturn),
-      totalReturnPercent: Math.round(totalReturnPercent * 100) / 100,
-      dayChange: Math.round(dayChange),
-      dayChangePercent: Math.round(dayChangePercent * 100) / 100,
+      totalValue: Math.round(summary.totalMarketValue),
+      investedCapital: Math.round(summary.totalInvested),
+      totalReturn: Math.round(summary.totalGain),
+      totalReturnPercent: Math.round(summary.totalGainPercent * 100) / 100,
+      dayChange: Math.round(summary.totalDailyChange),
+      dayChangePercent: Math.round(summary.totalDailyChangePercent * 100) / 100,
     }
   } catch (error) {
     console.error('Error fetching portfolio summary:', error)
@@ -152,5 +154,37 @@ export const getPortfolioSummary = createServerFn({
       dayChange: 0,
       dayChangePercent: 0,
     }
+  }
+})
+
+// New server function to get enriched positions
+export const getEnrichedPositions = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  try {
+    // Get all trade events
+    const events = await prisma.event.findMany({
+      where: {
+        eventType: EventType.TRADE_EXECUTED,
+      },
+      orderBy: {
+        timestamp: 'asc',
+      },
+    })
+
+    if (events.length === 0) {
+      return []
+    }
+
+    // Convert events to TradeExecution objects
+    const trades = events.map(parseTradeExecution)
+
+    // Use portfolio aggregator to get enriched positions
+    const positions = await portfolioAggregator.getEnrichedPositions(trades)
+
+    return positions
+  } catch (error) {
+    console.error('Error fetching enriched positions:', error)
+    return []
   }
 })

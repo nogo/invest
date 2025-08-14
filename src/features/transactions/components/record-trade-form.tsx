@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
-import { useRecordTradeMutation, brokerQueries } from '~/services/queries'
-import { Combobox } from '../ui/combobox'
+import { useRecordTradeMutation, brokerQueries } from '../api/queries'
+import { Combobox } from '~/components/ui/combobox'
 
 interface AddTransactionSidebarProps {
   onTransactionAdded?: () => void
@@ -54,7 +54,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       tradeDate: format(new Date(), 'yyyy-MM-dd'),
       commission: 0,
       fees: 0,
-      currency: 'USD' as const,
+      currency: 'EUR' as const,
       accountId: '',
       broker: '',
       exchange: '',
@@ -288,6 +288,30 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
             )}
           />
         </div>
+      </div>
+
+      {/* Currency */}
+      <div className="space-y-2">
+        <form.Field
+          name="currency"
+          children={(field) => (
+            <>
+              <Label htmlFor={field.name}>{t('trade.currency')} *</Label>
+              <Select value={field.state.value} onValueChange={(value) => field.handleChange(value as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EUR">EUR (€)</SelectItem>
+                  <SelectItem value="USD">USD ($)</SelectItem>
+                </SelectContent>
+              </Select>
+              {field.state.meta.errors && (
+                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+              )}
+            </>
+          )}
+        />
       </div>
 
       {/* Broker Information */}
