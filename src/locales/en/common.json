@@ -47,6 +47,7 @@
     "sell": "Sell",
     "symbol": "Symbol",
     "isin": "ISIN",
+    "name": "Name",
     "quantity": "Quantity",
     "price": "Price",
     "totalAmount": "Total Amount",

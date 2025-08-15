@@ -193,8 +193,8 @@ This roadmap outlines the development tasks needed to complete the MVP based on 
 
 The MVP will be considered complete when:
 
-- [ ] Users can add buy/sell trades with all required fields
-- [ ] Dashboard shows accurate total invested, market value, and P&L
+- [X] Users can add buy/sell trades with all required fields
+- [X] Dashboard shows accurate total invested, market value, and P&L
 - [ ] Current holdings list displays all positions with correct FIFO cost basis
 - [ ] Asset detail pages show complete trade history and position evolution
 - [ ] Global search/filter works across all views

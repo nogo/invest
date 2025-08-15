@@ -183,3 +183,5 @@ Track trades, not portfolios. Users record individual buy/sell transactions, and
 - **Global Search**: Filter all views by symbol
 - **Date Range**: Filter trades by date
 - **Trade Type**: Show only buys or sells
+- "Domain, lib functions and services need to have tests"
+- use bun test for testing

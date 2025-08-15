@@ -10,7 +10,7 @@ import { AssetChart } from '~/features/assets/components/asset-chart'
 import { PositionSummary } from '~/features/assets/components/position-summary'
 
 export const Route = createFileRoute('/assets/$symbol')({
-  component: AssetDetail,
+  component: AssetDetail
 })
 
 function AssetDetail() {

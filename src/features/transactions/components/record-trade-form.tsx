@@ -45,6 +45,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
 
   const form = useForm({
     defaultValues: {
+      name: '',
       isin: '',
       symbol: '',
       assetType: 'STOCK' as const,
@@ -65,6 +66,7 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       const formData = {
         isin: value.isin,
         symbol: value.symbol,
+        name: value.name,
         assetType: value.assetType,
         direction: value.direction,
         quantity: value.quantity,
@@ -94,7 +96,8 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
       }}
       className="space-y-4"
     >
-      {/* Asset Information */}<div className="space-y-2">
+      {/* Asset Information */}
+      <div className="space-y-2">
         <form.Field
           name="isin"
           children={(field) => (
@@ -126,6 +129,26 @@ export function RecordTradeForm({ onTransactionAdded }: AddTransactionSidebarPro
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
                 placeholder="AAPL"
+              />
+              {field.state.meta.errors && (
+                <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+              )}
+            </>
+          )}
+        />
+      </div>
+      <div className="space-y-2">
+        <form.Field
+          name="name"
+          children={(field) => (
+            <>
+              <Label htmlFor={field.name}>{t('trade.name')} *</Label>
+              <Input
+                id={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
+                placeholder="Apple Inc"
+                maxLength={12}
               />
               {field.state.meta.errors && (
                 <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
