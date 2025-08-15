@@ -92,34 +92,41 @@ This roadmap outlines the development tasks needed to complete the MVP based on 
   - Show trade quantities and realized P&L on markers
   - Handle cases with no price data gracefully
 
-### 4. Enhanced Dashboard Metrics 💰 **MEDIUM PRIORITY**
+### 4. ✅ Enhanced Dashboard Metrics 💰 **COMPLETED**
 
 #### 4.1 Portfolio Summary Enhancements
-- [ ] **Update portfolio summary components**
-  - `src/features/portfolio/components/money-invested.tsx` - Show total invested with trend
-  - `src/features/portfolio/components/current-value.tsx` - Show market value with P&L
-  - Add new component `src/features/portfolio/components/performance-metrics.tsx` for total return %
+- [X] **Update portfolio summary components**
+  - ✅ `src/features/portfolio/components/money-invested.tsx` - Shows total invested with proper formatting and filter integration
+  - ✅ `src/features/portfolio/components/current-value.tsx` - Shows market value with P&L, day change badges, and color-coded returns
+  - ✅ `src/features/portfolio/components/portfolio-summary.tsx` - Combines metrics in responsive grid layout
+  - ✅ Advanced features: loading states, error handling, internationalization, filter integration
 
 #### 4.2 Dashboard Layout Updates
-- [ ] **Update main dashboard** (`src/routes/index.tsx`)
-  - Add holdings list display
-  - Improve metrics layout to match MVP design
-  - Ensure responsive design for mobile/desktop
+- [X] **Update main dashboard** (`src/routes/index.tsx`)
+  - ✅ Add holdings list display with comprehensive position information
+  - ✅ Improve metrics layout with responsive design
+  - ✅ Ensure responsive design for mobile/desktop
+  - ✅ Integrated with global filtering system
 
-### 5. Enhanced Search & Filter 🔍 **LOW PRIORITY**
+### 5. ✅ Enhanced Search & Filter 🔍 **COMPLETED**
 
 #### 5.1 Global Filter Enhancement
 - [X] **Enhance portfolio filter** (`src/features/portfolio/components/portfolio-filter.tsx`)
-  - Add date range filtering capabilities
-  - Add asset type filtering (Stock/ETF)
-  - Ensure filters apply to all dashboard components
+  - ✅ Add date range filtering capabilities with quick presets (90d, 6m, 1y, 3y, 5y, All)
+  - ✅ Add custom date range selection with calendar inputs
+  - ✅ Add asset type filtering (Stock/ETF/All)
+  - ✅ Full-width search bar with enhanced UX
+  - ✅ Toggle-group interface for date range selection
+  - ✅ Form state management with URL parameters
+  - ✅ Ensure filters apply to all dashboard components
 
 #### 5.2 Filter Integration
 - [X] **Update all components to respect global filters**
-  - Investment chart should filter by date/symbol
-  - Holdings list should filter by symbol/type
-  - History list already supports basic search - enhance for other filters
-  - Portfolio metrics should reflect filtered data
+  - ✅ Investment chart filters by date/symbol
+  - ✅ Holdings list filters by symbol/type
+  - ✅ History list supports enhanced search and filtering
+  - ✅ Portfolio metrics reflect filtered data
+  - ✅ Filter state persists in URL parameters
 
 ### 6. Trade Management Features ✏️ **LOW PRIORITY**
 
@@ -205,6 +212,9 @@ The MVP will be considered complete when:
 - [X] Global search/filter works across all views
 - [X] Basic price chart shows trade markers
 - [X] All calculations follow FIFO methodology correctly
+- [X] Enhanced dashboard metrics with comprehensive portfolio insights
+- [X] Advanced filtering with date ranges and asset types
+- [ ] Manual price entry system for current asset prices
 - [ ] Application handles edge cases (no trades, no positions, etc.)
 
 ## Files That Need Creation
