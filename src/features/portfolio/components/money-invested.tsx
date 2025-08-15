@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries';
+import { usePortfolioFilters } from '../hooks/usePortfolioFilters'
 
 interface MoneyInvestedProps {
   className?: string
@@ -9,7 +10,9 @@ interface MoneyInvestedProps {
 
 export function MoneyInvested({ className }: MoneyInvestedProps) {
   const { t } = useTranslation('common');
-  const { data: summary, isLoading, isError } = useQuery(portfolioQueries.summary())
+  const filters = usePortfolioFilters()
+  
+  const { data: summary, isLoading, isError } = useQuery(portfolioQueries.summary(filters))
 
   if (isLoading) {
     return (

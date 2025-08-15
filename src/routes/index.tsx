@@ -7,16 +7,19 @@ import { PortfolioSummary } from '~/features/portfolio/components/portfolio-summ
 import { PortfolioFilter } from '~/features/portfolio/components/portfolio-filter'
 import { InvestmentChart } from '~/features/portfolio/components/investment-chart'
 import { HoldingsList } from '~/features/portfolio/components/holdings-list'
-import { HistoryList } from '~/features/history/components/history-list'
 
 const searchSchema = z.object({
   q: z.string().optional(),
+  tradeType: z.enum(['BUY', 'SELL', 'ALL']).optional(),
+  assetType: z.enum(['STOCK', 'ETF', 'ALL']).optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
 });
 
 export const Route = createFileRoute('/')({
   component: Home,
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { q } }) => ({ search: q }),
+  loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search } }) => {
     return {
       search
@@ -30,8 +33,17 @@ function Home() {
 
   return (
     <div className="container mx-auto px-6 py-8">
+      {/* Filter Toolbar - Positioned above everything else */}
+      <PortfolioFilter 
+        query={search.q}
+        tradeType={search.tradeType}
+        assetType={search.assetType}
+        dateFrom={search.dateFrom}
+        dateTo={search.dateTo}
+      />
 
-      <div className="flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center">
+      {/* Portfolio Summary & Actions */}
+      <div className="flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center mb-8">
         <PortfolioSummary />
         <div className="flex gap-2">
           <Button size="sm" variant="outline">
@@ -47,18 +59,10 @@ function Home() {
         </div>
       </div>
 
-      <div className="my-8">
-        <PortfolioFilter query={search} />
-      </div>
-
       <InvestmentChart />
 
       <div className="mt-8">
-        <HoldingsList searchQuery={search} />
-      </div>
-
-      <div className="mt-8">
-        <HistoryList searchQuery={search} />
+        <HoldingsList />
       </div>
     </div>
   )

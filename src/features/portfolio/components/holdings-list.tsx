@@ -8,9 +8,9 @@ import { TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react"
 import { formatCurrency, formatPercent } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
 import type { EnrichedPosition } from '../domain/portfolio-aggregator'
+import { usePortfolioFilters } from '../hooks/usePortfolioFilters'
 
 interface HoldingsListProps {
-	searchQuery?: string
 	className?: string
 }
 
@@ -124,18 +124,13 @@ function PositionItem({ position }: PositionItemProps) {
 	)
 }
 
-export function HoldingsList({ searchQuery, className }: HoldingsListProps) {
+export function HoldingsList({ className }: HoldingsListProps) {
 	const { t } = useTranslation('common')
-	const { data: positions = [], isLoading, isError } = useQuery(portfolioQueries.enrichedPositions())
+	const filters = usePortfolioFilters()
+	
+	const { data: positions = [], isLoading, isError } = useQuery(portfolioQueries.enrichedPositions(filters))
 
-	// Filter positions based on search query
-	const filteredPositions = searchQuery 
-		? positions.filter(position => 
-			position.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			position.isin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			(position.priceData?.name && position.priceData.name.toLowerCase().includes(searchQuery.toLowerCase()))
-		)
-		: positions
+	// Positions are already filtered on the server side based on the filters
 
 	if (isLoading) {
 		return (
@@ -171,8 +166,8 @@ export function HoldingsList({ searchQuery, className }: HoldingsListProps) {
 		)
 	}
 
-	const positionsWithoutPrices = filteredPositions.filter(p => !p.priceData).length
-	const totalPositions = filteredPositions.length
+	const positionsWithoutPrices = positions.filter(p => !p.priceData).length
+	const totalPositions = positions.length
 
 	return (
 		<Card className={className}>
@@ -183,16 +178,16 @@ export function HoldingsList({ searchQuery, className }: HoldingsListProps) {
 						<CardDescription>
 							{totalPositions} position{totalPositions !== 1 ? 's' : ''}
 							{positionsWithoutPrices > 0 && ` • ${positionsWithoutPrices} without current prices`}
-							{searchQuery && ` • filtered by "${searchQuery}"`}
+							{(filters.q || filters.tradeType || filters.assetType || filters.dateFrom || filters.dateTo) && ` • filtered`}
 						</CardDescription>
 					</div>
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-0">
-				{filteredPositions.map((position, index) => (
+				{positions.map((position, index) => (
 					<div key={position.isin}>
 						<PositionItem position={position} />
-						{index < filteredPositions.length - 1 && <Separator />}
+						{index < positions.length - 1 && <Separator />}
 					</div>
 				))}
 			</CardContent>

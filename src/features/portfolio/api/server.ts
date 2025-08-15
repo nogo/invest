@@ -1,10 +1,9 @@
 import { createServerFn } from '@tanstack/react-start'
-import { format } from 'date-fns'
+import { z } from 'zod'
 import prisma from '~/lib/prisma'
 import { EventType } from '~/generated/prisma/client'
 import { portfolioAggregator } from '../domain/portfolio-aggregator'
 import type { TradeExecution } from '../domain/position-calculator'
-import type { Currency } from '~/features/prices/domain/types'
 
 export interface InvestmentTimelinePoint {
   date: string
@@ -20,6 +19,57 @@ export interface PortfolioSummary {
   totalReturnPercent: number
   dayChange: number
   dayChangePercent: number
+}
+
+// Filter schema for portfolio queries
+const PortfolioFilterSchema = z.object({
+  q: z.string().optional(),
+  assetType: z.enum(['STOCK', 'ETF', 'ALL']).optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+})
+
+export type PortfolioFilter = z.infer<typeof PortfolioFilterSchema>
+
+/**
+ * Apply filters to trade events
+ */
+function applyFiltersToEvents(events: any[], filters: PortfolioFilter) {
+  return events.filter(event => {
+    const payload = JSON.parse(event.payload)
+    
+    // Apply search query filter (symbol, name, or ISIN)
+    if (filters.q) {
+      const query = filters.q.toLowerCase()
+      const matchesSymbol = payload.symbol?.toLowerCase().includes(query)
+      const matchesName = payload.name?.toLowerCase().includes(query)
+      const matchesISIN = payload.isin?.toLowerCase().includes(query)
+      
+      if (!matchesSymbol && !matchesName && !matchesISIN) {
+        return false
+      }
+    }
+    
+    // Apply asset type filter
+    if (filters.assetType && filters.assetType !== 'ALL' && payload.assetType !== filters.assetType) {
+      return false
+    }
+    
+    // Apply date range filters
+    if (filters.dateFrom || filters.dateTo) {
+      const tradeDate = new Date(event.timestamp).toISOString().split('T')[0]
+      
+      if (filters.dateFrom && tradeDate && tradeDate < filters.dateFrom) {
+        return false
+      }
+      
+      if (filters.dateTo && tradeDate && tradeDate > filters.dateTo) {
+        return false
+      }
+    }
+    
+    return true
+  })
 }
 
 /**
@@ -57,10 +107,10 @@ function parseTradeExecution(event: any): TradeExecution {
 // Server function to get investment timeline data from events
 export const getInvestmentTimeline = createServerFn({
   method: 'GET',
-}).handler(async (): Promise<InvestmentTimelinePoint[]> => {
+}).validator(PortfolioFilterSchema).handler(async ({ data: filters }): Promise<InvestmentTimelinePoint[]> => {
   try {
     // Get all trade events ordered by timestamp
-    const events = await prisma.event.findMany({
+    const allEvents = await prisma.event.findMany({
       where: {
         eventType: EventType.TRADE_EXECUTED,
       },
@@ -68,6 +118,9 @@ export const getInvestmentTimeline = createServerFn({
         timestamp: 'asc',
       },
     })
+
+    // Apply filters
+    const events = applyFiltersToEvents(allEvents, filters)
 
     if (events.length === 0) {
       return []
@@ -93,7 +146,7 @@ export const getInvestmentTimeline = createServerFn({
         date: point.date,
         invested: Math.round(point.invested),
         value: Math.round(currentValue),
-        month: `${monthNames[parseInt(month, 10) - 1]} ${year}`,
+        month: `${monthNames[parseInt(month || '1', 10) - 1] || 'Jan'} ${year || ''}`,
       }
     })
 
@@ -107,10 +160,10 @@ export const getInvestmentTimeline = createServerFn({
 // Server function to get portfolio summary from events
 export const getPortfolioSummary = createServerFn({
   method: 'GET',
-}).handler(async (): Promise<PortfolioSummary> => {
+}).validator(PortfolioFilterSchema).handler(async ({ data: filters }): Promise<PortfolioSummary> => {
   try {
     // Get all trade events
-    const events = await prisma.event.findMany({
+    const allEvents = await prisma.event.findMany({
       where: {
         eventType: EventType.TRADE_EXECUTED,
       },
@@ -118,6 +171,9 @@ export const getPortfolioSummary = createServerFn({
         timestamp: 'asc',
       },
     })
+
+    // Apply filters
+    const events = applyFiltersToEvents(allEvents, filters)
 
     if (events.length === 0) {
       return {
@@ -160,10 +216,10 @@ export const getPortfolioSummary = createServerFn({
 // New server function to get enriched positions
 export const getEnrichedPositions = createServerFn({
   method: 'GET',
-}).handler(async () => {
+}).validator(PortfolioFilterSchema).handler(async ({ data: filters }) => {
   try {
     // Get all trade events
-    const events = await prisma.event.findMany({
+    const allEvents = await prisma.event.findMany({
       where: {
         eventType: EventType.TRADE_EXECUTED,
       },
@@ -171,6 +227,9 @@ export const getEnrichedPositions = createServerFn({
         timestamp: 'asc',
       },
     })
+
+    // Apply filters
+    const events = applyFiltersToEvents(allEvents, filters)
 
     if (events.length === 0) {
       return []

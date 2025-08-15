@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge } from '~/components/ui/badge'
 import { formatCurrency, formatPercent } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
+import { usePortfolioFilters } from '../hooks/usePortfolioFilters'
 
 interface CurrentValueProps {
   className?: string
@@ -10,7 +11,9 @@ interface CurrentValueProps {
 
 export function CurrentValue({ className }: CurrentValueProps) {
   const { t } = useTranslation('common');
-  const { data: summary, isLoading, isError } = useQuery(portfolioQueries.summary())
+  const filters = usePortfolioFilters()
+  
+  const { data: summary, isLoading, isError } = useQuery(portfolioQueries.summary(filters))
 
   if (isLoading) {
     return (

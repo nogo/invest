@@ -11,6 +11,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ReferenceLine } from "rec
 import { useMemo } from 'react'
 import { formatCurrencyCutted } from '~/lib/i18n'
 import { portfolioQueries } from '../api/queries'
+import { usePortfolioFilters } from '../hooks/usePortfolioFilters'
 
 
 const chartConfig = {
@@ -30,7 +31,9 @@ interface InvestmentChartProps {
 
 export function InvestmentChart({ className }: InvestmentChartProps) {
   const { t } = useTranslation('common');
-  const { data: investmentTimelineData = [], isLoading, isError } = useQuery(portfolioQueries.timeline())
+  const filters = usePortfolioFilters()
+  
+  const { data: investmentTimelineData = [], isLoading, isError } = useQuery(portfolioQueries.timeline(filters))
 
   const timelineMetrics = useMemo(() => {
     if (!investmentTimelineData || investmentTimelineData.length === 0) {
