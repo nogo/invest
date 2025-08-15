@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { ParsedCSVRow } from './csv-parser'
-import { TradeExecutedPayload, DividendReceivedPayload } from './events/trading-events'
+import { TradeExecutedPayload } from '~/features/trades/domain/events'
+import { DividendReceivedPayload } from '~/features/dividends/domain/events'
 import { EventType } from '~/generated/prisma/client'
 
 export interface ImportEvent {

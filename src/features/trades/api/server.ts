@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { addBusinessDays, format } from 'date-fns'
-import { TradeExecutedPayload } from '~/lib/events/trading-events'
+import { TradeExecutedPayload } from '~/features/trades/domain/events'
 import { EventType } from '~/generated/prisma/client'
-import { TradeFormSchema } from '~/features/transactions/domain/validators'
+import { TradeFormSchema } from '~/features/trades/domain/validators'
 import prisma from '~/lib/prisma'
 
 export const createTradeEvent = createServerFn({ method: 'POST' })

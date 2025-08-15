@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import prisma from '~/lib/prisma'
-import { TradeExecutedPayload } from '~/lib/events/trading-events'
+import { TradeExecutedPayload } from '~/features/trades/domain/events'
 import { EventType } from '~/generated/prisma/client'
 
 export const listHistory = createServerFn({ method: 'GET' })

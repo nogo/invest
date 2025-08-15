@@ -185,3 +185,4 @@ Track trades, not portfolios. Users record individual buy/sell transactions, and
 - **Trade Type**: Show only buys or sells
 - "Domain, lib functions and services need to have tests"
 - use bun test for testing
+- always create or update tests when you create domain logic
